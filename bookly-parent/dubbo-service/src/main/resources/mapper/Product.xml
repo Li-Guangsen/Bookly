@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.dubbo.dao.ProductDao">
+    <resultMap id="ProductResultMap" type="Product">
+        <!--        把查询的ID映射为type指定的类的属性-->
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="subtitle" property="subtitle"/>
+        <result column="main_image" property="mainImage"/>
+        <result column="author" property="author"/>
+        <result column="publisher" property="publisher"/>
+        <result column="publish_date" property="publishDate"/>
+        <result column="stock" property="stock"/>
+        <result column="sale" property="sale"/>
+        <result column="status" property="status"/>
+        <result column="price" property="price"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+    <sql id="selectColumns">
+        SELECT id,
+               name,
+               category_id,
+               subtitle,
+               main_image,
+               author,
+               publisher,
+               publish_date,
+               stock,
+               sale,
+               status,
+               price,
+               deleted,
+               detail
+        FROM t_product
+    </sql>
+    <select id="findAll" resultMap="ProductResultMap">
+        <include refid="selectColumns"/>
+        <where>
+            deleted = 1
+            <if test="pro.id != null">
+                and id = #{pro.id}
+            </if>
+            <if test="pro.name != null and pro.name != ''">
+                and name like concat('%', #{pro.name}, '%')
+            </if>
+            <if test="pro.categoryId != null">
+                and category_id = #{pro.categoryId}
+            </if>
+            <if test="pro.status != null">
+                and status = #{pro.status}
+            </if>
+            <if test="pro.author != null and pro.author != ''">
+                and author like concat('%', #{pro.author}, '%')
+            </if>
+            <if test="pro.publishDate != null ">
+                and publish_date &gt;=  #{pro.publishDate}
+            </if>
+        </where>
+    </select>
+    <select id="findById" resultType="Product">
+        <include refid="selectColumns"/>
+        where id = #{id} and deleted = 1
+    </select>
+    <insert id="save" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="Product">
+        insert into t_product(name,
+                              category_id,
+                              subtitle,
+                              main_image,
+                              author,
+                              publisher,
+                              publish_date,
+                              stock,
+                              sale,
+                              price,
+                              detail)
+        values (#{name},
+                #{categoryId},
+                #{subtitle},
+                #{mainImage},
+                #{author},
+                #{publisher},
+                #{publishDate},
+                #{stock},
+                #{sale},
+                #{price},
+                #{detail})
+    </insert>
+    <update id="update" parameterType="Product">
+        update t_product
+        set name = #{name},
+            category_id = #{categoryId},
+            subtitle = #{subtitle},
+            main_image = #{mainImage},
+            author = #{author},
+            publisher = #{publisher},
+            publish_date = #{publishDate},
+            stock = #{stock},
+            sale = #{sale},
+            price = #{price},
+            status = #{status},
+            detail = #{detail}
+        where id = #{id}
+    </update>
+    <update id="delete">
+        update t_product
+        set deleted = 0
+        where id = #{id}
+    </update>
+    <update id="updateStatus">
+        update t_product
+        set status = #{status}
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+    <select id="finByCategoryId" resultMap="ProductResultMap">
+        <include refid="selectColumns"/>
+        where category_id = #{categoryId} and deleted = 1
+    </select>
+
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.admin.backend.dao.AdminDao">
+    <sql id="selectColumns">
+        SELECT id,
+               username,
+               name,
+               phone,
+               note,
+               status
+        FROM t_admin
+    </sql>
+    <select id="findAll" resultType="Admin">
+        <include refid="selectColumns"/>
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="username != null and username != ''">
+                and username like concat('%', #{username}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone like concat('%', #{phone}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="selectByPrimaryKey" resultType="Admin">
+        <include refid="selectColumns"/>
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+    </select>
+    <select id="findAdminByUsername" resultType="Admin">
+        SELECT id,
+               username,
+               name,
+               phone,
+               note,
+               status
+        FROM t_admin
+        where username = #{username}
+    </select>
+    <delete id="deleteByPrimaryKey">
+        delete
+        from t_admin
+        where id = #{id}
+    </delete>
+    <insert id="insert" parameterType="Admin">
+        insert into t_admin(username,
+                           password,
+                           name,
+                           phone,
+                           note
+                           )
+        values (#{username}, #{password}, #{name}, #{phone}, #{note});
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="Admin">
+        update t_admin
+        set username=#{username},
+            name=#{name},
+            phone=#{phone},
+            note=#{note},
+            status=#{status}
+        where id = #{id}
+    </update>
+    <update id="updatePassword" parameterType="Admin">
+        update t_admin
+        set password=#{password}
+        where id = #{id}
+    </update>
+</mapper>
